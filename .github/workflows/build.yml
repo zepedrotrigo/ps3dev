@@ -1,0 +1,24 @@
+name: PS3 ARM Build
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04-arm
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build PS3DEV Docker
+        run: |
+          git clone https://github.com/ps3dev/ps3dev-docker
+          cd ps3dev-docker
+          docker build -t ps3dev-docker .
+
+      - name: Build SPRX
+        run: |
+          docker run --rm -v "$GITHUB_WORKSPACE":/build -w /build ps3dev-docker make
+
+      - name: Upload SPRX
+        uses: actions/upload-artifact@v4
+        with:
+          name: dualsense_bridge
+          path: dualsense_bridge.sprx
